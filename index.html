@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iluminar Aulas - Aulas Particulares de Matemática e Física</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.23.9/babel.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <!-- Substituindo o kit genérico pelo CDN oficial do Font Awesome 6 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .btn-primary {
+      transition: transform 0.2s, background-color 0.3s;
+      animation: pulse 2s infinite ease-in-out; /* Animação de pulsar */
+      display: inline-flex; /* Garante que o botão seja visível */
+      align-items: center;
+      gap: 8px; /* Espaço entre ícone e texto */
+    }
+    .btn-primary:hover {
+      transform: scale(1.05);
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    .card {
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    .result-animation {
+      animation: fadeIn 0.5s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .logo {
+      width: 150px;
+    }
+    .profile-pic {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%);
+    }
+    .circle {
+      width: 600px;
+      height: 600px;
+      background-color: #FBBF24;
+      border-radius: 50%;
+      overflow: hidden;
+      position: absolute;
+      right: 5%;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    @media (max-width: 768px) {
+      .hero-section {
+        flex-direction: column !important; /* Empilha os elementos em coluna */
+        align-items: center;
+        padding-top: 100px; /* Espaço para a navbar fixa */
+      }
+      .hero-text {
+        width: 100% !important; /* Texto ocupa toda a largura */
+        text-align: center;
+        margin-bottom: 20px; /* Espaço entre o texto e o círculo */
+      }
+      .circle {
+        position: static !important; /* Remove o posicionamento absoluto */
+        transform: none !important; /* Remove a transformação */
+        width: 300px; /* Tamanho reduzido para telas menores */
+        height: 300px;
+        margin: 0 auto; /* Centraliza o círculo */
+      }
+      .social-buttons {
+        justify-content: center; /* Centraliza os botões em telas menores */
+      }
+    }
+    .availability-table {
+      margin-top: 20px;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      border-collapse: collapse;
+      background-color: #f9fafb;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .availability-table th,
+    .availability-table td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .availability-table th {
+      background-color: #006633; /* Verde da UnB */
+      color: white;
+      font-weight: 600;
+    }
+    .availability-table td {
+      background-color: white;
+      color: #374151;
+    }
+    .availability-table tr:last-child td {
+      border-bottom: none;
+    }
+    @media (max-width: 768px) {
+      .availability-table th,
+      .availability-table td {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body class="bg-white">
+  <div id="root"></div>
+
+  <script type="text/babel">
+    function App() {
+      const [duration, setDuration] = React.useState(1);
+      const [frequency, setFrequency] = React.useState(1);
+      const [pricePerClass, setPricePerClass] = React.useState(0);
+      const [pricePerWeek, setPricePerWeek] = React.useState(0);
+      const [pricePerMonth, setPricePerMonth] = React.useState(0);
+
+      React.useEffect(() => {
+        AOS.init({ duration: 1000, once: true });
+        calculatePrice();
+        console.log("Hero section rendered with social buttons"); // Log para verificar renderização
+      }, [duration, frequency]);
+
+      const calculatePrice = () => {
+        const basePrices = {
+          1: 85, // 1 hora
+          1.5: 120, // 1,5 horas
+          2: 150 // 2 horas
+        };
+        const displacementFee = 35; // Taxa de deslocamento fixa
+        const priceForClass = basePrices[duration] + displacementFee; // Valor por aula
+        const priceForWeek = priceForClass * frequency; // Valor semanal
+        const priceForMonth = priceForWeek * 4; // Valor mensal (4 semanas)
+
+        setPricePerClass(priceForClass);
+        setPricePerWeek(priceForWeek);
+        setPricePerMonth(priceForMonth);
+      };
+
+      return (
+        <div>
+          {/* Navbar */}
+          <nav className="fixed top-0 left-0 w-full bg-white text-black shadow-md z-50">
+            <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+              <div className="flex items-center">
+                {/* Insira a URL da sua logo aqui */}
+                <img src="src/images/logo.png" alt="Iluminar Aulas Logo" className="logo" />
+              </div>
+              <div className="space-x-6">
+                <a href="#home" className="hover:text-blue-600 transition">Início</a>
+                <a href="#sobre" className="hover:text-blue-600 transition">Sobre</a>
+                <a href="#beneficios" className="hover:text-blue-600 transition">Benefícios</a>
+                <a href="#orcamento" className="hover:text-blue-600 transition">Orçamento</a>
+                <a href="#horarios" className="hover:text-blue-600 transition">Horários</a>
+              </div>
+            </div>
+          </nav>
+
+          {/* Hero Section */}
+          <section id="home" className="min-h-screen flex items-center relative hero-section">
+            <div className="container mx-auto px-4 flex items-center">
+              <div className="w-1/2 hero-text" data-aos="fade-right">
+                <h2 className="text-6xl font-bold text-black mb-4">Aprenda com Clareza.</h2>
+                <p className="text-lg text-gray-700 mb-4">Aulas particulares de Matemática e Física com um mestre pela UnB.</p>
+                <div className="flex gap-4 mt-4 social-buttons">
+                  <a href="https://wa.me/5551999999999" target="_blank" className="btn-primary text-black hover:text-green-500">
+                    <i className="fab fa-whatsapp text-2xl"></i>
+                    <span>WhatsApp</span>
+                  </a>
+                  <a href="https://instagram.com/iluminar.aulas" target="_blank" className="btn-primary text-black hover:text-pink-500">
+                    <i className="fab fa-instagram text-2xl"></i>
+                    <span>Instagram</span>
+                  </a>
+                </div>
+              </div>
+              <div className="circle" data-aos="fade-left">
+                {/* Insira a URL da sua foto aqui */}
+                <img src="src/images/CV_Leonardo.png" alt="Professor Iluminar Aulas" className="profile-pic" />
+              </div>
+            </div>
+          </section>
+
+          {/* About Section */}
+          <section id="sobre" className="py-20 bg-white">
+            <div className="container mx-auto px-4" data-aos="fade-up">
+              <h2 className="text-4xl font-bold text-center text-black mb-8">Sobre a Iluminar Aulas</h2>
+              <div className="flex justify-center mb-8">
+                <i className="fas fa-book-open text-5xl text-blue-800"></i>
+              </div>
+              <p className="text-lg text-gray-700 text-center max-w-3xl mx-auto">Fundada em 2022, a Iluminar Aulas é liderada por um mestre em Física pela Universidade de Brasília, com mais de 5 anos de experiência em ensino. Nossa missão é tornar o aprendizado de Matemática e Física acessível, prático e eficaz, com aulas personalizadas que atendem às suas necessidades.</p>
+            </div>
+          </section>
+
+          {/* Benefits Section */}
+          <section id="beneficios" className="py-20 bg-gray-50">
+            <div className="container mx-auto px-4">
+              <h2 className="text-4xl font-bold text-center text-black mb-12" data-aos="fade-up">Por que escolher a Iluminar Aulas?</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="card bg-white p-6 rounded-xl shadow-md text-center" data-aos="fade-up" data-aos-delay="100">
+                  <i className="fas fa-user-graduate text-4xl text-blue-800 mb-4"></i>
+                  <h3 className="text-xl font-semibold text-black mb-2">Aulas Personalizadas</h3>
+                  <p className="text-gray-600">Aulas adaptadas às suas necessidades e ritmo de aprendizado.</p>
+                </div>
+                <div className="card bg-white p-6 rounded-xl shadow-md text-center" data-aos="fade-up" data-aos-delay="200">
+                  <i className="fas fa-check-circle text-4xl text-blue-800 mb-4"></i>
+                  <h3 className="text-xl font-semibold text-black mb-2">Metodologia Eficaz</h3>
+                  <p className="text-gray-600">Ensino comprovado com foco em resultados e compreensão profunda.</p>
+                </div>
+                <div className="card bg-white p-6 rounded-xl shadow-md text-center" data-aos="fade-up" data-aos-delay="300">
+                  <i className="fas fa-clock text-4xl text-blue-800 mb-4"></i>
+                  <h3 className="text-xl font-semibold text-black mb-2">Horários Flexíveis</h3>
+                  <p className="text-gray-600">Ajustamos os horários para se encaixar na sua rotina.</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Calculator Section */}
+          <section id="orcamento" className="py-20 bg-white">
+            <div className="container mx-auto px-4" data-aos="fade-up">
+              <h2 className="text-4xl font-bold text-center text-black mb-8">Faça seu Orçamento</h2>
+              <div className="max-w-lg mx-auto bg-gray-50 p-8 rounded-xl shadow-md">
+                <div className="mb-6">
+                  <label className="block text-lg font-semibold text-gray-800 mb-2">Duração da Aula</label>
+                  <select 
+                    value={duration} 
+                    onChange={(e) => setDuration(parseFloat(e.target.value))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800"
+                  >
+                    <option value="1">1 hora (R$ 85,00 + R$ 35,00 deslocamento)</option>
+                    <option value="1.5">1,5 horas (R$ 120,00 + R$ 35,00 deslocamento)</option>
+                    <option value="2">2 horas (R$ 150,00 + R$ 35,00 deslocamento)</option>
+                  </select>
+                </div>
+                <div className="mb-6">
+                  <label className="block text-lg font-semibold text-gray-800 mb-2">Frequência Semanal</label>
+                  <select 
+                    value={frequency} 
+                    onChange={(e) => setFrequency(parseInt(e.target.value))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-800"
+                  >
+                    <option value="1">1 vez por semana</option>
+                    <option value="2">2 vezes por semana</option>
+                    <option value="3">3 vezes por semana</option>
+                  </select>
+                </div>
+                <div className="mt-6 text-center result-animation">
+                  <div className="bg-gray-100 p-4 rounded-lg">
+                    <p className="text-lg font-bold text-black">Valor por Aula: <span className="text-blue-800">R$ {pricePerClass.toFixed(2)}</span></p>
+                    <p className="text-lg font-bold text-black">Valor Semanal: <span className="text-blue-800">R$ {pricePerWeek.toFixed(2)}</span></p>
+                    <p className="text-lg font-bold text-black">Valor Mensal (4 semanas): <span className="text-blue-800">R$ {pricePerMonth.toFixed(2)}</span></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Availability Section */}
+          <section id="horarios" className="py-20 bg-gray-50">
+            {/* Calendário de Disponibilidade */}
+            <div className="calendar-container">
+                  <h3 className="text-xl font-semibold text-gray-800 mb-4 text-center">Horários Disponíveis</h3>
+                  
+                    <iframe src=
+                    "https://calendar.google.com/calendar/appointments/schedules/AcZssZ1eyCvm5Kw2o938Awl74mu6k8NBfY3k0un2WHIM2xEortCdWMTOZNhUq6IWS4sCTJrZzzrZrwrv?gv=true" 
+                     
+                    width="100%" 
+                    height="600" 
+                    
+                    ></iframe>
+                    
+                </div>
+          </section>
+
+          {/* Footer */}
+          <footer className="bg-white text-black py-10">
+            <div className="container mx-auto px-4 text-center">
+              <div className="mb-4">
+                {/* Insira a URL da sua logo aqui */}
+                <img src="src/images/logo.png" alt="Iluminar Aulas Logo" className="logo mx-auto" />
+              </div>
+              <p className="text-lg">Brasília, DF</p>
+              <p className="text-lg mb-4">© 2025 Iluminar Aulas. Todos os direitos reservados.</p>
+              <div className="flex justify-center gap-4">
+                <a href="https://wa.me/5551999999999" target="_blank" className="text-black hover:text-green-500">
+                  <i className="fab fa-whatsapp text-2xl"></i>
+                </a>
+                <a href="https://instagram.com/iluminaraulas" target="_blank" className="text-black hover:text-pink-500">
+                  <i className="fab fa-instagram text-2xl"></i>
+                </a>
+              </div>
+            </div>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>
